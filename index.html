@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Money Log</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#234e52">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Money Log">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #234e52; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #f2f5f4; }
+  .loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; font: 600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  .loading img { width: 72px; height: 72px; border-radius: 18px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div class="loading"><img src="icon-192.png" alt="">Opening Money Log…</div>
+<!-- Paste the Web app URL (ends in /exec) between the quotes below. -->
+<iframe id="app" title="Money Log" allow="clipboard-write"
+  src="https://script.google.com/macros/s/AKfycbzrhzxiVaowidsq8rmGS2Ou6DK1GHtJMm9KE9nnKqJhh2MojGcdlMTU-NRHluLOM5P-/exec"></iframe>
+</body>
+</html>
