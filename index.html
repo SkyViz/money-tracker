@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <title>Money Log</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
 <meta name="theme-color" content="#234e52">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,18 +12,852 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-512.png">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com">
 <style>
-  html, body { margin: 0; height: 100%; background: #234e52; }
-  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #f2f5f4; }
-  .loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #fff; font: 600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  .loading img { width: 72px; height: 72px; border-radius: 18px; margin-bottom: 14px; }
-</style>
-</head>
-<body>
-<div class="loading"><img src="icon-192.png" alt="">Opening Money Log…</div>
-<!-- Paste the Web app URL (ends in /exec) between the quotes below. -->
-<iframe id="app" title="Money Log" allow="clipboard-write"
-  src="https://script.google.com/macros/s/AKfycbzrhzxiVaowidsq8rmGS2Ou6DK1GHtJMm9KE9nnKqJhh2MojGcdlMTU-NRHluLOM5P-/exec"></iframe>
-</body>
-</html>
+:root{--teal:#234e52;--teal2:#2f6b70;--ink:#1f2a2b;--muted:#6b7b7c;--line:#d5dedd;--bg:#f2f5f4;--soft:#e7efee;--in:#1d7a4f;--inbg:#e3f4ea;--out:#b3432f;--outbg:#fbe9e5;--gold:#c98a12;--goldbg:#fdf3dc}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.wrap{max-width:520px;margin:0 auto;padding-bottom:8px}
+header{background:linear-gradient(155deg,var(--teal) 0%,var(--teal2) 100%);color:#fff;padding:calc(22px + env(safe-area-inset-top)) 20px 62px;border-radius:0 0 24px 24px}
+.hello{font-size:13px;opacity:.75}
+h1{margin:2px 0 0;font-size:24px;font-weight:750;letter-spacing:-.3px}
+.bal{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:-46px 16px 0;position:relative}
+.tile{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 4px 14px rgba(20,40,40,.08)}
+.tile .lab{font-size:12px;color:var(--muted);font-weight:600}
+.tile .num{font-size:21px;font-weight:750;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.tile.wide{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:10px 14px}
+.tile.wide .num{font-size:16px;margin:0}
+.tile.nw{grid-column:1/-1;background:linear-gradient(135deg,#fff 0%,#eef6f4 100%);border:1.5px solid #cfe2de;padding:14px}
+.tile.nw .row1{display:flex;justify-content:space-between;align-items:center}
+.tile.nw .num{font-size:26px;margin:0}
+.tile.nw small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.tile.owed{background:var(--goldbg)}
+.tile.owed .lab{color:#7a5a12}
+.tile.owed .right{display:flex;align-items:center;gap:10px}
+.tile.owed button{border:0;background:#fff;color:#7a5a12;font:inherit;font-size:12px;font-weight:700;padding:7px 10px;border-radius:9px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.views{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:14px;background:rgba(255,255,255,.14);padding:4px;border-radius:12px}
+.views button{border:0;background:transparent;color:#d8e6e5;font:inherit;font-size:14px;font-weight:700;padding:9px;border-radius:9px;cursor:pointer}
+.views button.on{background:#fff;color:var(--teal)}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:16px 16px 12px}
+.mnav button{width:42px;height:42px;border-radius:12px;border:0;background:#fff;font-size:22px;color:var(--teal);box-shadow:0 1px 4px rgba(20,40,40,.08);cursor:pointer}
+.mnav button:disabled{opacity:.3}
+.mnav div{text-align:center}.mnav b{font-size:17px;display:block}.mnav small{font-size:12px;color:var(--muted)}
+.hero{margin:0 16px 12px;border-radius:20px;padding:18px;color:#fff;background:linear-gradient(140deg,#234e52 0%,#2f6b70 60%,#3d8a7f 100%);box-shadow:0 8px 20px rgba(35,78,82,.25)}
+.hero .lab{font-size:13px;opacity:.8;font-weight:600}
+.hero .big{font-size:38px;font-weight:800;letter-spacing:-1px;margin:2px 0 6px;font-variant-numeric:tabular-nums}
+.delta{display:inline-block;font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;background:rgba(255,255,255,.18)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.chips div{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 6px;text-align:center}
+.chips small{display:block;font-size:11px;opacity:.75}.chips b{font-size:14px;font-variant-numeric:tabular-nums}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 12px}
+.kpi{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 1px 4px rgba(20,40,40,.05)}
+.kpi .lab{font-size:12px;color:var(--muted);font-weight:650}
+.kpi .num{font-size:20px;font-weight:750;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.kpi small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:2px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{font-family:inherit;font-size:9px;fill:#6b7b7c}
+.cat{padding:8px 0;border-top:1px solid #edf1f0}.cat:first-of-type{border-top:0}
+.cat .top{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:6px}
+.cat .top span:last-child{font-variant-numeric:tabular-nums}
+.cat .top small{color:var(--muted);font-weight:500;margin-left:6px}
+.track{height:8px;border-radius:99px;background:#edf1f0;overflow:hidden}.track div{height:100%;border-radius:99px}
+.acct{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #edf1f0}.acct:first-of-type{border-top:0}
+.acct .name{flex:1;font-size:14px;font-weight:600}.acct .name small{display:block;font-size:12px;color:var(--muted);font-weight:450}
+.acct .amt{font-size:15px}
+.acctsum{display:flex;justify-content:space-between;background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:14px;font-weight:650}
+.loan{border-top:1px solid #edf1f0;padding:12px 0}.loan:first-of-type{border-top:0}
+.loan .head{display:flex;align-items:center;gap:12px}
+.loan .av{width:38px;height:38px;border-radius:50%;background:var(--soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.loan .who{flex:1;min-width:0;font-weight:650;font-size:15px}
+.loan .who small{display:block;font-size:12px;color:var(--muted);font-weight:450}
+.loan .owe{text-align:right;font-weight:750;font-variant-numeric:tabular-nums}
+.loan .owe small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.loan .track{margin:10px 0 8px}
+.loan .actions{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.btn2{border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.btn2.solid{background:var(--teal);color:#fff}
+.repay{background:var(--soft);border-radius:12px;padding:12px;margin-top:10px}
+.badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:1px;text-transform:uppercase;letter-spacing:.3px}
+.badge.open{background:var(--soft);color:var(--teal)}.badge.over{background:var(--outbg);color:var(--out)}.badge.done{background:var(--inbg);color:var(--in)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:16px;background:#e1e8e7;padding:4px;border-radius:14px}
+.tab{border:0;background:transparent;padding:9px 4px 8px;border-radius:11px;font:inherit;font-size:13px;font-weight:650;color:var(--muted);cursor:pointer}
+.tab .ic{display:block;font-size:20px;margin-bottom:1px}
+.tab.on{background:#fff;color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.card{background:#fff;border-radius:18px;margin:0 16px 12px;padding:16px;box-shadow:0 1px 4px rgba(20,40,40,.05)}
+.card h2{font-size:16px;margin:0 0 2px}
+.sub{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.4}
+.pill{display:inline-block;font-size:11px;font-weight:750;padding:3px 9px;border-radius:99px;letter-spacing:.4px;text-transform:uppercase;margin:4px 0 4px}
+.pill.in{background:var(--inbg);color:var(--in)}.pill.out{background:var(--outbg);color:var(--out)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #edf1f0}
+.group .row:first-of-type{border-top:0}
+.row .name{flex:1;min-width:0}
+.row .name div{font-size:15px;font-weight:550}
+.row .name small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.money{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;width:128px;padding:0 10px;background:#fafcfb;transition:border-color .15s}
+.money span{color:var(--muted);font-size:16px}
+.money input{border:0;outline:0;background:transparent;font:inherit;font-size:17px;width:100%;padding:10px 0 10px 4px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.money:focus-within{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(35,78,82,.12)}
+.money.filled{border-color:#9fbcb9}
+.money.big{width:100%;padding:0 14px}
+.money.big span{font-size:26px}
+.money.big input{font-size:30px;font-weight:750;text-align:left;padding:12px 0 12px 6px}
+.field{margin-bottom:12px}
+.field>label{display:block;font-size:12px;font-weight:650;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+select,input.text,input.date{width:100%;font:inherit;font-size:16px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fafcfb;color:var(--ink);-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,#6b7b7c 50%),linear-gradient(135deg,#6b7b7c 50%,transparent 50%);background-position:calc(100% - 18px) 52%,calc(100% - 13px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+select:focus,input.text:focus,input.date:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 3px rgba(35,78,82,.12)}
+.datechip{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:6px 6px 6px 12px;margin-bottom:12px}
+.datechip span{font-size:13px;font-weight:650;color:var(--teal);white-space:nowrap}
+.datechip input{border:0;background:#fff;padding:8px 10px;border-radius:9px;font-size:15px}
+.sum{border-radius:14px;padding:12px 14px;margin-top:6px;background:var(--soft)}
+.sum .line{display:flex;justify-content:space-between;font-size:14px;padding:3px 0;color:var(--muted)}
+.sum .line b{color:var(--ink);font-variant-numeric:tabular-nums}
+.sum .line.total{border-top:1px dashed #b9cbc9;margin-top:6px;padding-top:8px;font-size:15px;color:var(--ink);font-weight:650}
+.sum .line.total b{font-size:18px}
+.pos{color:var(--in)!important}.neg{color:var(--out)!important}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.seg button{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 8px;font:inherit;font-size:14px;font-weight:650;color:var(--ink);cursor:pointer}
+.seg button.on{border-color:var(--teal);background:var(--soft);color:var(--teal)}
+.flow{display:flex;align-items:stretch;gap:8px;margin:2px 0 14px}
+.flow .end{flex:1;text-align:center;border-radius:14px;padding:10px 6px;background:var(--soft)}
+.flow .end .e{font-size:22px}
+.flow .end small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.flow .end b{display:block;font-variant-numeric:tabular-nums;margin-top:2px}
+.flow .end .after{font-size:12px;color:var(--muted);margin-top:2px}
+.flow .arrow{align-self:center;font-size:22px;color:var(--teal);font-weight:700}
+.note{background:var(--goldbg);color:#7a5a12;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.4;margin-top:4px}
+.save{position:sticky;bottom:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(rgba(242,245,244,0),var(--bg) 35%);z-index:5}
+.save button{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-size:17px;font-weight:750;background:var(--teal);color:#fff;box-shadow:0 6px 16px rgba(35,78,82,.28);cursor:pointer}
+.save button:disabled{opacity:.5;box-shadow:none}
+.recent h2{display:flex;justify-content:space-between;align-items:baseline}
+.recent h2 small{font-size:12px;color:var(--muted);font-weight:500}
+.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #edf1f0}
+.item:first-of-type{border-top:0}
+.dot{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;background:var(--soft)}
+.dot.in{background:var(--inbg)}.dot.out{background:var(--outbg)}.dot.tr{background:var(--goldbg)}
+.item .what{flex:1;min-width:0;font-size:14px;font-weight:600}
+.item .what small{display:block;font-size:12px;color:var(--muted);font-weight:450;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amt{font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:15px}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:10px 0}
+.toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,16px);background:#1f2a2b;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;transition:all .25s;pointer-events:none;max-width:88%;text-align:center;z-index:9;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--out)}
+.hide{display:none!important}
+.sync{position:fixed;top:0;left:0;right:0;height:3px;z-index:20;background:linear-gradient(90deg,transparent,#f7c95e,transparent);background-size:40% 100%;background-repeat:no-repeat;animation:sync 1.1s linear infinite}
+@keyframes sync{from{background-position:-40% 0}to{background-position:140% 0}}
+.sk{background:linear-gradient(90deg,#eef2f1,#e2e8e7,#eef2f1);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:8px;height:22px;margin-top:4px}
+@keyframes sh{to{background-position:-200% 0}}
+.pinbox{max-width:300px;margin:60px auto;text-align:center;padding:0 20px}
+.pinbox .lock{font-size:40px}
+.pinbox input{text-align:center;font-size:28px;letter-spacing:10px;margin:14px 0}
+.pinbox button{width:100%;border:0;border-radius:14px;padding:14px;font:inherit;font-size:16px;font-weight:700;background:var(--teal);color:#fff}
+</style></head>
+<body><div class="sync hide" id="sync"></div><div class="wrap">
+
+<div id="pinScreen" class="pinbox hide">
+  <div class="lock">🔒</div>
+  <h2>Money Log</h2>
+  <p class="sub" id="pinMsg">Enter your PIN</p>
+  <input id="pinInput" class="text" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
+  <button onclick="submitPin()">Open</button>
+</div>
+
+<div id="app">
+  <header>
+    <div class="hello" id="hello">Money Log</div>
+    <h1 id="title">What happened today?</h1>
+    <div class="views"><button id="v-log" class="on" onclick="showView('log')">✏️ Log money</button><button id="v-dash" onclick="showView('dash')">📊 Dashboard</button></div>
+  </header>
+
+  <div class="bal">
+    <div class="tile"><div class="lab">👛 Purse</div><div class="num" id="bPurse"><div class="sk"></div></div></div>
+    <div class="tile"><div class="lab">🫙 Coins at home</div><div class="num" id="bCoins"><div class="sk"></div></div></div>
+    <div class="tile nw"><div class="row1"><div class="lab">📈 Net worth</div><div class="num" id="bNet">…</div></div><small id="bNetSub">What you own minus what you owe</small></div>
+    <div class="tile wide"><div class="lab">🏦 All cash and bank</div><div class="num" id="bTotal">…</div></div>
+    <div class="tile wide owed hide" id="owedTile"><div><div class="lab">💼 Cora's owes you</div><small style="display:block;font-size:11px;color:#7a5a12;opacity:.8;margin-top:2px">Settles when you log Cora's Interac</small></div><div class="num" id="bOwed"></div></div>
+    <div class="tile wide hide" id="lentTile"><div class="lab">🤝 Lent out, still owed</div><div class="num" id="bLent"></div></div>
+  </div>
+
+  <section id="dashView" class="hide">
+    <div class="mnav"><button id="mPrev" onclick="navMonth(-1)">‹</button><div><b id="mLabel">…</b><small id="mSub"></small></div><button id="mNext" onclick="navMonth(1)">›</button></div>
+    <div id="dashBody"><div class="card"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>
+  </section>
+
+  <div id="logView">
+  <div class="tabs">
+    <button class="tab on" id="t-shift" onclick="showTab('shift')"><span class="ic">🍽️</span>Shift</button>
+    <button class="tab" id="t-coras" onclick="showTab('coras')"><span class="ic">💼</span>Cora's pay</button>
+    <button class="tab" id="t-other" onclick="showTab('other')"><span class="ic">🧾</span>Spend</button>
+    <button class="tab" id="t-income" onclick="showTab('income')"><span class="ic">💰</span>Income</button>
+    <button class="tab" id="t-transfer" onclick="showTab('transfer')"><span class="ic">🔁</span>Transfer</button>
+    <button class="tab" id="t-coins" onclick="showTab('coins')"><span class="ic">🪙</span>Coins</button>
+    <button class="tab" id="t-loans" onclick="showTab('loans')"><span class="ic">🤝</span>Loans</button>
+  </div>
+
+  <!-- SHIFT -->
+  <section id="p-shift">
+    <div class="card">
+      <h2>Tonight's shift</h2>
+      <p class="sub"><b>Cash tips taken home</b> is the cash you actually brought home; fill in what you paid out too and the tracker adds it back. <b>Tips due</b> is what Cora's will pay you by Interac.</p>
+      <div class="datechip"><span id="shiftDateLabel">📅 Today</span><input class="date" type="date" id="shiftDate" onchange="dateLabel('shift')"></div>
+      <div class="pill in">Money in</div>
+      <div class="group" id="g-in"></div>
+      <div class="pill out" style="margin-top:10px">Paid out</div>
+      <div class="group" id="g-out"></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="shiftDetails" placeholder="e.g. Dinner shift" maxlength="200"></div>
+      <div class="sum" id="shiftSum"></div>
+    </div>
+  </section>
+
+  <!-- CORA'S PAY -->
+  <section id="p-coras" class="hide">
+    <div class="card">
+      <h2>Cora's Interac</h2>
+      <p class="sub">Type the Interac you received. It pays back what Cora's owes you first, and the rest is your card tips.</p>
+      <div class="datechip"><span id="corasDateLabel">📅 Today</span><input class="date" type="date" id="corasDate" onchange="dateLabel('coras')"></div>
+      <div class="field"><label>Interac received</label><div class="money big"><span>$</span><input id="corasAmount" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="corasAuto()"></div></div>
+      <div class="sum" id="corasSum" style="margin:0 0 14px"></div>
+      <div class="field"><label>Of this, card tips</label><div class="money" style="width:100%"><span>$</span><input id="corasTips" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="CORAS_EDITED = true; renderCoras()"></div>
+        <div class="hint" style="font-size:12px;color:var(--muted);margin-top:6px">Filled in for you. Change it only if Cora's told you a different card tips amount.</div></div>
+      <div class="field"><label>Paid into</label><select id="corasAccount"></select></div>
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="corasDetails" placeholder="e.g. Week of Nov 3" maxlength="200"></div>
+    </div>
+  </section>
+
+  <!-- OTHER -->
+  <section id="p-other" class="hide">
+    <div class="card">
+      <h2>Spend</h2>
+      <p class="sub">Something you paid for, one amount at a time.</p>
+      <div class="datechip"><span id="otherDateLabel">📅 Today</span><input class="date" type="date" id="otherDate" onchange="dateLabel('other')"></div>
+      <div class="field"><label>Amount</label><div class="money big"><span>$</span><input id="otherAmount" inputmode="decimal" placeholder="0.00" autocomplete="off"></div></div>
+      <div class="field"><label>Category</label><select id="category" onchange="categoryChanged()"></select></div>
+      <div class="field"><label id="accountLabel">Paid from</label><select id="account"></select></div>
+      <div class="field hide" id="toField"><label>Transfer to</label><select id="transferTo"></select></div>
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="otherDetails" placeholder="e.g. Groceries at Metro" maxlength="200"></div>
+    </div>
+  </section>
+
+  <!-- INCOME -->
+  <section id="p-income" class="hide">
+    <div class="card">
+      <h2>Other income</h2>
+      <p class="sub">Money that isn't tips: bank interest, a refund, a gift.</p>
+      <div class="datechip"><span id="incomeDateLabel">📅 Today</span><input class="date" type="date" id="incomeDate" onchange="dateLabel('income')"></div>
+      <div class="field"><label>Amount</label><div class="money big"><span>$</span><input id="incomeAmount" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="setSave()"></div></div>
+      <div class="field"><label>Category</label><select id="incomeCategory" onchange="setSave()"></select></div>
+      <div class="field"><label>Paid into</label><select id="incomeAccount"></select></div>
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="incomeDetails" placeholder="e.g. Savings interest, November" maxlength="200"></div>
+    </div>
+  </section>
+
+  <!-- TRANSFER -->
+  <section id="p-transfer" class="hide">
+    <div class="card">
+      <h2>Transfer between accounts</h2>
+      <p class="sub">Moving your own money: cash into the bank, paying the credit card, chequing to savings.</p>
+      <div class="datechip"><span id="transferDateLabel">📅 Today</span><input class="date" type="date" id="transferDate" onchange="dateLabel('transfer')"></div>
+      <div class="field"><label>Amount</label><div class="money big"><span>$</span><input id="trAmount" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="renderTr()"></div></div>
+      <div class="field"><label>From</label><select id="trFrom" onchange="renderTr()"></select></div>
+      <div style="text-align:center;margin:-4px 0 8px"><button onclick="swapTr()" style="border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 14px;font:inherit;font-size:13px;font-weight:650;color:var(--teal)">⇅ Swap</button></div>
+      <div class="field"><label>To</label><select id="trTo" onchange="renderTr()"></select></div>
+      <div class="sum" id="trSum" style="margin:0 0 12px"></div>
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="trDetails" placeholder="e.g. Deposited cash at the bank" maxlength="200"></div>
+    </div>
+  </section>
+
+  <!-- LOANS -->
+  <section id="p-loans" class="hide">
+    <div class="card">
+      <h2>Money you lent</h2>
+      <p class="sub">Personal loans to people. Tap <b>Mark repaid</b> when money comes back.</p>
+      <div id="loanList"></div>
+    </div>
+    <div class="card">
+      <h2>Lend money</h2>
+      <p class="sub">Adds a row to the Loans tab and takes the money out of the account you paid from.</p>
+      <div class="datechip"><span id="loansDateLabel">📅 Today</span><input class="date" type="date" id="loansDate" onchange="dateLabel('loans')"></div>
+      <div class="field"><label>Lent to</label><input class="text" id="loanPerson" placeholder="Name" maxlength="80" oninput="setSave()" list="loanPeople"><datalist id="loanPeople"></datalist></div>
+      <div class="field"><label>Amount</label><div class="money big"><span>$</span><input id="loanAmount" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="setSave()"></div></div>
+      <div class="field"><label>Paid from</label><select id="loanFrom"></select></div>
+      <div class="field"><label>Due date (optional)</label><input class="date" type="date" id="loanDue" style="width:100%;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fafcfb"></div>
+      <div class="field" style="margin:0"><label>Notes (optional)</label><input class="text" id="loanNotes" placeholder="e.g. For rent, pays back after payday" maxlength="200"></div>
+    </div>
+  </section>
+
+  <!-- COINS -->
+  <section id="p-coins" class="hide">
+    <div class="card">
+      <h2>Move coins</h2>
+      <p class="sub">Purse too heavy? Log the coins you put in the jar at home. Taking coins back out works the same way.</p>
+      <div class="seg">
+        <button id="d-home" class="on" onclick="coinDir('home')">👛 → 🫙 To home</button>
+        <button id="d-purse" onclick="coinDir('purse')">🫙 → 👛 To purse</button>
+      </div>
+      <div class="datechip"><span id="coinsDateLabel">📅 Today</span><input class="date" type="date" id="coinsDate" onchange="dateLabel('coins')"></div>
+      <div class="field"><label>Value of the coins</label><div class="money big"><span>$</span><input id="coinsAmount" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="renderFlow()"></div></div>
+      <div class="flow" id="flow"></div>
+      <div class="field" style="margin:0"><label>Details (optional)</label><input class="text" id="coinsDetails" placeholder="e.g. Emptied the coin pocket" maxlength="200"></div>
+    </div>
+  </section>
+
+  <div class="card recent">
+    <h2>Last entries <small>newest first</small></h2>
+    <div id="recent"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+  </div>
+
+  <div class="save"><button id="saveBtn" onclick="save()" disabled>Save</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+// The tracker's data service: the Web app URL of the Apps Script deployment.
+var API = 'https://script.google.com/macros/s/AKfycbzrhzxiVaowidsq8rmGS2Ou6DK1GHtJMm9KE9nnKqJhh2MojGcdlMTU-NRHluLOM5P-/exec';
+var PENDING = 0, DASH_SEQ = 0;
+var TABS = ['shift', 'coras', 'other', 'income', 'transfer', 'coins', 'loans'], REPAY_OPEN = 0, VIEW = 'log', DASH_STALE = true;
+var D = null, TAB = 'shift', DIR = 'home', PIN = '', BUSY = false, CORAS_EDITED = false;
+try { PIN = localStorage.getItem('mt_pin') || ''; } catch (e) {}
+
+function el(id) { return document.getElementById(id); }
+function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+function num(v) { var n = parseFloat(String(v == null ? '' : v).split(',').join('').split('$').join('')); return isNaN(n) ? 0 : Math.round(n * 100) / 100; }
+function money(n) { n = Number(n) || 0; var s = Math.abs(n).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); return (n < 0 ? '-$' : '$') + s; }
+function signed(n) { return (n > 0 ? '+' : '') + money(n); }
+function bal(name) { var b = (D.balances || []).filter(function (x) { return x.name === name; })[0]; return b ? b.balance : 0; }
+function short(name) { return name === D.purse ? 'Purse' : name === D.coins ? 'Coins at home' : name; }
+
+function toast(msg, err) {
+  var t = el('toast'); t.textContent = msg; t.className = 'toast show' + (err ? ' err' : '');
+  clearTimeout(toast.t); toast.t = setTimeout(function () { t.className = 'toast'; }, err ? 4500 : 2600);
+}
+
+function cacheGet(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+function cacheSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function busy(step) { PENDING = Math.max(0, PENDING + step); el('sync').classList.toggle('hide', PENDING === 0); }
+
+function call(fn, args, ok) {
+  var fail = function (m) {
+    BUSY = false; setSave();
+    if (m.indexOf('PIN_') !== -1) return askPin(m);
+    toast(m.replace('Exception: ', '').replace('Error: ', ''), true);
+  };
+  busy(1);
+  // Sent as plain text so the browser needs no extra permission round trip.
+  fetch(API, { method: 'POST', body: JSON.stringify({ fn: fn, args: args }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) { return { j: j }; }, function () {
+      return { err: navigator.onLine === false ? 'You are offline. Try again when you are connected.' : 'Could not reach the tracker. Try again in a moment.' };
+    })
+    .then(function (x) {
+      busy(-1);
+      if (x.err) fail(x.err);
+      else if (x.j && x.j.ok) ok(x.j.data);
+      else fail(String((x.j && x.j.error) || 'Something went wrong.'));
+    });
+}
+
+function askPin(m) {
+  el('app').classList.add('hide'); el('pinScreen').classList.remove('hide');
+  el('pinMsg').textContent = m.indexOf('LOCKED') !== -1 ? 'Too many tries. Wait an hour and try again.'
+    : m.indexOf('WRONG') !== -1 ? 'That PIN did not match. Try again.' : 'Enter your PIN';
+  el('pinInput').value = ''; el('pinInput').focus();
+}
+function submitPin() {
+  PIN = el('pinInput').value.trim();
+  try { localStorage.setItem('mt_pin', PIN); } catch (e) {}
+  el('pinScreen').classList.add('hide'); el('app').classList.remove('hide');
+  load();
+}
+
+function load() { call('appLoad', [PIN], function (d) { render(d); }); }
+
+function greet() {
+  var h = new Date().getHours();
+  el('hello').textContent = (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ' 👋';
+}
+
+// fromCache: showing what was saved last time while fresh numbers load.
+function render(data, fromCache) {
+  var before = D && D.today;
+  D = data; greet();
+  if (!fromCache) cacheSet('mt_data', data);
+  el('bPurse').textContent = money(bal(D.purse));
+  el('bCoins').textContent = money(bal(D.coins));
+  var total = 0; (D.balances || []).forEach(function (b) { if (!b.card && !b.owed) total += b.balance; });
+  el('bTotal').textContent = money(total);
+  var nw = D.netWorth || { value: 0 };
+  el('bNet').textContent = money(nw.value);
+  el('bNet').className = 'num' + (nw.value < 0 ? ' neg' : '');
+  el('bNetSub').textContent = nw.fromSheet ? 'What you own minus what you owe (same as the Dashboard tab)'
+    : 'Cash and bank + what Cora’s owes you − card balances';
+  var owed = bal(D.owed);
+  el('owedTile').classList.toggle('hide', !(owed > 0.004));
+  var lent = 0; (D.loans || []).forEach(function (l) { if (l.owed > 0) lent += l.owed; });
+  el('lentTile').classList.toggle('hide', !(lent > 0.004));
+  el('bLent').textContent = money(lent);
+  renderLoans();
+  el('bOwed').textContent = money(owed);
+
+  if (!el('g-in').children.length) buildShift();
+  shiftAccountsText();
+  if (!el('category').options.length) buildOther();
+  TABS.forEach(function (k) { var i = el(k + 'Date'); if (!i.value || i.value === before) i.value = D.today; dateLabel(k); });
+  renderRecent(); renderShiftSum(); renderFlow(); corasAuto(); renderTr(); setSave();
+}
+
+function buildShift() {
+  D.shiftFields.forEach(function (f) {
+    var row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = '<div class="name"><div>' + esc(f.label) + '</div><small id="acc-' + f.key + '"></small></div>' +
+      '<div class="money"><span>$</span><input id="f-' + f.key + '" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>';
+    el(f.group === 'in' ? 'g-in' : 'g-out').appendChild(row);
+    el('f-' + f.key).addEventListener('input', function (ev) {
+      ev.target.parentNode.classList.toggle('filled', num(ev.target.value) > 0); renderShiftSum(); setSave();
+    });
+  });
+}
+function shiftAccountsText() {
+  D.shiftFields.forEach(function (f) {
+    var s = el('acc-' + f.key);
+    if (!s) return;
+    var cash = cashAccount();
+    if (!f.account) s.textContent = 'No account set on Setup';
+    else if (f.key === 'cashTips') s.textContent = 'brought home · into ' + short(f.account);
+    else if (f.due) s.textContent = 'Interac tips · Cora’s pays them';
+    else if (f.owed) s.textContent = 'from tips · Cora’s pays it back';
+    else if (f.fromTips && f.account === cash) s.textContent = 'paid from tips';
+    else s.textContent = (f.group === 'in' ? 'into ' : 'from ') + short(f.account);
+  });
+}
+
+function cashAccount() {
+  var f = D.shiftFields.filter(function (x) { return x.key === 'cashTips'; })[0];
+  return f ? f.account : D.purse;
+}
+
+// Mirrors the server: cash given or paid out of the tips is added back onto the take-home.
+function renderShiftSum() {
+  if (!D) return;
+  var cash = cashAccount(), v = function (k) { return num(el('f-' + k).value); };
+  var takeHome = v('cashTips'), due = 0, paid = 0, owedTonight = 0, cashDelta = takeHome, other = {};
+  D.shiftFields.forEach(function (f) {
+    var x = v(f.key);
+    if (!x || f.key === 'cashTips') return;
+    if (f.due) { due += x; owedTonight += x; return; }
+    if (f.owed) owedTonight += x;
+    if (f.fromTips && f.account === cash) { paid += x; return; }
+    var s = f.group === 'in' ? x : -x;
+    if (f.account === cash) cashDelta += s; else other[f.account] = (other[f.account] || 0) + s;
+  });
+  var cashTips = takeHome + paid, h = '';
+  if (paid) {
+    h += '<div class="line"><span>Take-home cash tips</span><b>' + money(takeHome) + '</b></div>' +
+      '<div class="line"><span>+ paid out in cash</span><b>' + money(paid) + '</b></div>' +
+      '<div class="line"><span>= Cash tips</span><b class="pos">' + money(cashTips) + '</b></div>';
+  } else {
+    h += '<div class="line"><span>Cash tips</span><b class="pos">' + money(cashTips) + '</b></div>';
+  }
+  if (due) h += '<div class="line"><span>Tips due (Interac)</span><b class="pos">' + money(due) + '</b></div>' +
+    '<div class="line"><span>Total tips tonight</span><b class="pos">' + money(cashTips + due) + '</b></div>';
+  Object.keys(other).forEach(function (a) {
+    h += '<div class="line"><span>' + esc(short(a || 'No account')) + '</span><b>' + signed(other[a]) + '</b></div>';
+  });
+  if (owedTonight) {
+    h += '<div class="line"><span>💼 Cora’s owes you for tonight</span><b>' + money(owedTonight) + '</b></div>' +
+      '<div class="line"><span>💼 Cora’s owes you in total</span><b>' + money(bal(D.owed) + owedTonight) + '</b></div>';
+  }
+  h += '<div class="line total"><span>👛 ' + esc(short(cash)) + ' after this shift</span><b>' + money(bal(cash) + cashDelta) + '</b></div>';
+  if (cashDelta) h += '<div class="line"><span>Change</span><b class="' + (cashDelta > 0 ? 'pos' : 'neg') + '">' + signed(cashDelta) + '</b></div>';
+  el('shiftSum').innerHTML = h;
+}
+
+// Cora's pay: the Interac clears what Cora's owes first; the rest is card tips.
+function corasAuto() {
+  if (!D) return;
+  if (!CORAS_EDITED) {
+    var amt = num(el('corasAmount').value), owed = Math.max(0, bal(D.owed));
+    var tips = Math.max(0, Math.round((amt - owed) * 100) / 100);
+    el('corasTips').value = amt ? tips.toFixed(2) : '';
+  }
+  renderCoras();
+}
+function renderCoras() {
+  if (!D) return;
+  var amt = num(el('corasAmount').value), tips = num(el('corasTips').value), owed = bal(D.owed);
+  var repay = Math.round((amt - tips) * 100) / 100, left = Math.round((owed - repay) * 100) / 100;
+  var h = '<div class="line"><span>💼 Cora’s owed you</span><b>' + money(owed) + '</b></div>';
+  if (amt) {
+    h += '<div class="line"><span>Paid back</span><b>' + money(repay) + '</b></div>' +
+      '<div class="line"><span>Card tips</span><b class="pos">' + money(tips) + '</b></div>' +
+      '<div class="line total"><span>Still owed after this</span><b class="' + (left < 0 ? 'neg' : '') + '">' + money(left) + '</b></div>';
+    if (tips > amt) h += '<div class="note">Card tips can’t be more than the Interac.</div>';
+    else if (left < -0.004) h += '<div class="note">This pays back more than Cora’s owes. Check the card tips amount.</div>';
+  }
+  el('corasSum').innerHTML = h;
+  setSave();
+}
+
+function isIncome(c) { return String(c.type).toLowerCase().indexOf('income') !== -1; }
+function isTransfer(c) { return String(c.type).toLowerCase().indexOf('transfer') !== -1; }
+// Fills a category dropdown, grouped by type. Shows every category if the filter finds none.
+function fillCategories(id, test) {
+  var sel = el(id), groups = {}, order = [];
+  var list = D.categories.filter(test); if (!list.length) list = D.categories;
+  sel.innerHTML = '<option value="">Choose a category…</option>';
+  list.forEach(function (c) {
+    var t = c.type || 'Other'; if (!groups[t]) { groups[t] = []; order.push(t); } groups[t].push(c.name);
+  });
+  order.forEach(function (t) {
+    var g = document.createElement('optgroup'); g.label = t;
+    groups[t].forEach(function (n) { var o = document.createElement('option'); o.value = n; o.textContent = n; g.appendChild(o); });
+    sel.appendChild(g);
+  });
+}
+function buildOther() {
+  fillCategories('category', function (c) { return !isIncome(c) && !isTransfer(c); });
+  fillCategories('incomeCategory', isIncome);
+  ['account', 'transferTo', 'corasAccount', 'incomeAccount', 'trFrom', 'trTo', 'loanFrom'].forEach(function (id) {
+    var s = el(id); s.innerHTML = id === 'transferTo' ? '<option value="">Choose…</option>' : '';
+    D.accounts.forEach(function (a) { var o = document.createElement('option'); o.value = a; o.textContent = a; s.appendChild(o); });
+  });
+  el('account').value = D.purse;
+  el('corasAccount').value = D.bank || D.accounts[0];
+  el('incomeAccount').value = D.bank || D.accounts[0];
+  el('trFrom').value = D.purse;
+  el('trTo').value = D.bank || D.accounts[0];
+  el('loanFrom').value = D.bank || D.accounts[0];
+  el('otherAmount').addEventListener('input', setSave);
+}
+function catType() { var n = el('category').value; var c = D.categories.filter(function (x) { return x.name === n; })[0]; return c ? c.type : ''; }
+function categoryChanged() {
+  var tr = catType() === 'Transfer';
+  el('toField').classList.toggle('hide', !tr);
+  el('accountLabel').textContent = tr ? 'Transfer from' : 'Paid from';
+  setSave();
+}
+
+function renderTr() {
+  if (!D) return;
+  var v = num(el('trAmount').value), a = el('trFrom').value, b = el('trTo').value;
+  var line = function (n, d) {
+    return '<div class="line"><span>' + esc(short(n)) + '</span><b>' + money(bal(n)) + (v ? ' → ' + money(bal(n) + d) : '') + '</b></div>';
+  };
+  el('trSum').innerHTML = a && b ? line(a, -v) + line(b, v) + (a === b ? '<div class="note">From and To are the same account.</div>' : '') : '';
+  setSave();
+}
+function swapTr() { var a = el('trFrom').value; el('trFrom').value = el('trTo').value; el('trTo').value = a; renderTr(); }
+
+// ---- Dashboard view: a copy of the Dashboard tab in the sheet
+function showView(v) {
+  VIEW = v;
+  el('v-log').classList.toggle('on', v === 'log'); el('v-dash').classList.toggle('on', v === 'dash');
+  el('logView').classList.toggle('hide', v !== 'log'); el('dashView').classList.toggle('hide', v !== 'dash');
+  if (v === 'dash') { el('title').textContent = 'Your dashboard'; if (DASH_STALE) loadDash(!!DASH); } else showTab(TAB);
+}
+var DASH = null, DASH_MONTH = '';
+var PALETTE = ['#2f6b70', '#e08a3c', '#c0504d', '#7a6bb3', '#3d8a7f', '#d4a72c', '#5b8bc0', '#a0679b', '#8a9a5b'];
+function loadDash(force) {
+  var key = 'mt_dash_' + (DASH_MONTH || 'now'), seq = ++DASH_SEQ, c = cacheGet(key);
+  if (c) { DASH = c; renderDash(c); }
+  else if (force) el('dashBody').innerHTML = '<div class="card"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>';
+  call('appDashboard', [PIN, DASH_MONTH], function (d) {
+    cacheSet(key, d);
+    if (seq !== DASH_SEQ) return; // a newer month was asked for meanwhile
+    DASH_STALE = false; DASH = d; renderDash(d);
+  });
+}
+function navMonth(step) {
+  if (!DASH) return;
+  var y = Number(DASH.ym.slice(0, 4)), m = Number(DASH.ym.slice(5, 7)) + step;
+  if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+  DASH_MONTH = y + '-' + (m < 10 ? '0' : '') + m;
+  loadDash(true);
+}
+function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+function round0(n) { return '$' + Math.round(n).toLocaleString('en-CA'); }
+
+function renderDash(d) {
+  var t = d.totals, p = d.prev;
+  el('mLabel').textContent = d.label;
+  el('mSub').textContent = d.isCurrent ? 'This month so far' : '';
+  el('mNext').disabled = d.isCurrent;
+  var h = '';
+
+  // Hero: tips
+  var change = p.tips ? Math.round((t.tips - p.tips) / p.tips * 100) : null;
+  h += '<div class="hero"><div class="lab">' + (d.isCurrent ? 'Tips this month' : 'Tips in ' + esc(d.label)) + '</div>' +
+    '<div class="big">' + money(t.tips) + '</div>' +
+    (!p.tips ? '<span class="delta">No tips logged in ' + esc(d.prevLabel) + '</span>' :
+      d.isCurrent ? '<span class="delta">' + esc(d.prevLabel) + ' total: ' + round0(p.tips) + '</span>' :
+      '<span class="delta">' + (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change) + '% vs ' + esc(d.prevLabel) + '</span>') +
+    '<div class="chips">' +
+    '<div><small>Cash</small><b>' + round0(t.cashTips) + '</b></div>' +
+    '<div><small>Interac</small><b>' + round0(t.cardTips) + '</b></div>' +
+    '<div><small>Shifts</small><b>' + t.shifts + '</b></div>' +
+    '<div><small>Per shift</small><b>' + (t.shifts ? round0(t.cashTips / t.shifts) : '–') + '</b></div>' +
+    '</div></div>';
+
+  // KPIs
+  h += '<div class="kpis">' +
+    '<div class="kpi"><div class="lab">💰 Money in</div><div class="num pos">' + money(t.income) + '</div><small>' +
+      (t.otherIncome > 0 ? money(t.otherIncome) + ' besides tips' : 'all from tips') + '</small></div>' +
+    '<div class="kpi"><div class="lab">🧾 Spent</div><div class="num neg">' + money(t.expenses) + '</div><small>' +
+      (p.expenses ? (t.expenses <= p.expenses ? 'less' : 'more') + ' than ' + esc(d.prevLabel) + ' (' + round0(p.expenses) + ')' : '&nbsp;') + '</small></div>' +
+    '<div class="kpi"><div class="lab">🐷 Saved</div><div class="num ' + (t.saved >= 0 ? 'pos' : 'neg') + '">' + money(t.saved) + '</div><small>' +
+      (t.income ? pct(t.saved, t.income) + '% of money in' : '&nbsp;') + '</small></div>' +
+    '<div class="kpi"><div class="lab">🤝 Tip-outs</div><div class="num">' + money(t.tipOuts) + '</div><small>' +
+      (t.cashTips ? pct(t.tipOuts, t.cashTips) + '% of cash tips' : 'kitchen, pass, change') + '</small></div>' +
+    '</div>';
+
+  // Tips by day
+  h += '<div class="card"><h2>Tips by day</h2><div class="legend"><span><i style="background:#2f6b70"></i>Cash</span><span><i style="background:#e0a93c"></i>Tips due / Interac</span></div>' +
+    dayChart(d) + '</div>';
+
+  // 6 months
+  h += '<div class="card"><h2>Last 6 months</h2><div class="legend"><span><i style="background:#2f6b70"></i>Tips</span><span><i style="background:#e0826b"></i>Spent</span></div>' +
+    trendChart(d) + '</div>';
+
+  // Spending
+  h += '<div class="card"><h2>Where your money went</h2>' + catBars(d.spending, t.expenses, 'Nothing spent in ' + d.label + '.') + '</div>';
+
+  // Income
+  h += '<div class="card"><h2>Money in</h2>' + catBars(d.income, t.income, 'No money in yet in ' + d.label + '.', true) + '</div>';
+
+  // Accounts (today)
+  h += '<div class="card"><h2>Accounts <small style="font-size:12px;color:var(--muted);font-weight:500">balances today</small></h2>' + accountsList() + '</div>';
+
+  el('dashBody').innerHTML = h;
+}
+
+function dayChart(d) {
+  var W = 320, H = 130, L = 4, B = 18, T = 14, n = d.daily.length, slot = (W - L * 2) / n, bw = Math.max(3, slot * 0.66);
+  var max = 1; d.daily.forEach(function (x) { if (x.cash + x.card > max) max = x.cash + x.card; });
+  var sc = (H - B - T) / max, s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '">';
+  s += '<line x1="0" x2="' + W + '" y1="' + T + '" y2="' + T + '" stroke="#edf1f0" stroke-dasharray="3 3"/>' +
+    '<text x="' + W + '" y="' + (T - 4) + '" text-anchor="end">' + round0(max) + '</text>' +
+    '<line x1="0" x2="' + W + '" y1="' + (H - B) + '" y2="' + (H - B) + '" stroke="#d5dedd"/>';
+  d.daily.forEach(function (x, i) {
+    var cx = L + i * slot + (slot - bw) / 2, y = H - B, hc = x.cash * sc, hd = x.card * sc;
+    if (d.today && x.day > d.today) s += '<rect x="' + cx + '" y="' + (y - 2) + '" width="' + bw + '" height="2" rx="1" fill="#edf1f0"/>';
+    if (hc) s += '<rect x="' + cx + '" y="' + (y - hc) + '" width="' + bw + '" height="' + hc + '" rx="2" fill="#2f6b70"><title>' + x.day + ': cash ' + money(x.cash) + '</title></rect>';
+    if (hd) s += '<rect x="' + cx + '" y="' + (y - hc - hd) + '" width="' + bw + '" height="' + hd + '" rx="2" fill="#e0a93c"><title>' + x.day + ': card ' + money(x.card) + '</title></rect>';
+    if (x.day === 1 || x.day % 5 === 0) s += '<text x="' + (cx + bw / 2) + '" y="' + (H - 5) + '" text-anchor="middle"' + (x.day === d.today ? ' style="fill:#234e52;font-weight:700"' : '') + '>' + x.day + '</text>';
+  });
+  return s + '</svg>';
+}
+
+function trendChart(d) {
+  var W = 320, H = 150, B = 18, T = 16, n = d.trend.length, slot = W / n, bw = slot * 0.3;
+  var max = 1; d.trend.forEach(function (x) { max = Math.max(max, x.tips, x.expenses); });
+  var sc = (H - B - T) / max, s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '">';
+  s += '<line x1="0" x2="' + W + '" y1="' + (H - B) + '" y2="' + (H - B) + '" stroke="#d5dedd"/>';
+  d.trend.forEach(function (x, i) {
+    var x0 = i * slot + slot / 2 - bw - 1, y = H - B, cur = x.ym === d.ym;
+    var ht = x.tips * sc, he = x.expenses * sc;
+    s += '<rect x="' + x0 + '" y="' + (y - ht) + '" width="' + bw + '" height="' + ht + '" rx="3" fill="#2f6b70"' + (cur ? '' : ' opacity=".75"') + '><title>Tips ' + money(x.tips) + '</title></rect>';
+    s += '<rect x="' + (x0 + bw + 2) + '" y="' + (y - he) + '" width="' + bw + '" height="' + he + '" rx="3" fill="#e0826b"' + (cur ? '' : ' opacity=".75"') + '><title>Spent ' + money(x.expenses) + '</title></rect>';
+    if (x.tips) s += '<text x="' + (x0 + bw / 2) + '" y="' + (y - ht - 3) + '" text-anchor="middle" style="font-size:8px">' + (x.tips >= 1000 ? (x.tips / 1000).toFixed(1) + 'k' : Math.round(x.tips)) + '</text>';
+    s += '<text x="' + (i * slot + slot / 2) + '" y="' + (H - 4) + '" text-anchor="middle"' + (cur ? ' style="fill:#234e52;font-weight:700"' : '') + '>' + esc(x.label) + '</text>';
+  });
+  return s + '</svg>';
+}
+
+function catBars(list, total, empty, green) {
+  if (!list.length) return '<div class="empty">' + esc(empty) + '</div>';
+  var top = list.slice(0, 7), rest = list.slice(7).reduce(function (a, x) { return a + x.amount; }, 0);
+  if (rest > 0) top.push({ name: 'Everything else', amount: rest });
+  var max = top[0].amount;
+  return top.map(function (x, i) {
+    var c = green ? (i === 0 ? '#1d7a4f' : '#5fa77f') : PALETTE[i % PALETTE.length];
+    return '<div class="cat"><div class="top"><span>' + esc(x.name) + '<small>' + pct(x.amount, total) + '%</small></span><span>' + money(x.amount) + '</span></div>' +
+      '<div class="track"><div style="width:' + Math.max(2, x.amount / max * 100) + '%;background:' + c + '"></div></div></div>';
+  }).join('');
+}
+
+function accountsList() {
+  var icon = function (b) { return b.name === D.purse ? '👛' : b.name === D.coins ? '🫙' : b.owed ? '💼' : b.card ? '💳' : '🏦'; };
+  var list = (D.balances || []).slice(), rank = function (b) { return b.card ? 3 : b.owed ? 2 : (b.name === D.purse || b.name === D.coins) ? 0 : 1; };
+  list.sort(function (a, b) { return rank(a) - rank(b); });
+  var cash = 0;
+  var h = list.map(function (b) {
+    if (!b.card && !b.owed) cash += b.balance;
+    var sub = b.card ? 'Credit card' : b.owed ? 'Paid by the weekly Interac' : b.name === D.purse ? 'Notes and coins you carry' : b.name === D.coins ? 'Coin jar at home' : (b.kind ? b.kind.charAt(0).toUpperCase() + b.kind.slice(1) : '');
+    return '<div class="acct"><div class="dot">' + icon(b) + '</div><div class="name">' + esc(b.name) + '<small>' + esc(sub) + '</small></div>' +
+      '<div class="amt' + (b.balance < 0 ? ' neg' : '') + '">' + money(b.balance) + '</div></div>';
+  }).join('');
+  var lent = 0; (D.loans || []).forEach(function (l) { if (l.owed > 0) lent += l.owed; });
+  if (lent > 0) h += '<div class="acct"><div class="dot">🤝</div><div class="name">Lent out<small>Still owed to you</small></div><div class="amt">' + money(lent) + '</div></div>';
+  return h + '<div class="acctsum"><span>🏦 Cash and bank</span><span>' + money(cash) + '</span></div>';
+}
+
+// ---- Loans
+function initials(n) { var p = String(n || '?').trim().split(' '); return (p[0].charAt(0) + (p[1] ? p[1].charAt(0) : '')).toUpperCase(); }
+function bankOptions(sel) {
+  return (D.balances || []).filter(function (b) { return !b.card && !b.owed; }).map(function (b) {
+    return '<option' + (b.name === sel ? ' selected' : '') + '>' + esc(b.name) + '</option>';
+  }).join('');
+}
+function renderLoans() {
+  if (!D) return;
+  var list = (D.loans || []).slice().sort(function (a, b) { return (b.owed > 0) - (a.owed > 0) || b.row - a.row; });
+  var people = {}; list.forEach(function (l) { if (l.person) people[l.person] = 1; });
+  el('loanPeople').innerHTML = Object.keys(people).map(function (p) { return '<option value="' + esc(p) + '">'; }).join('');
+  if (!list.length) { el('loanList').innerHTML = '<div class="empty">No loans yet.</div>'; return; }
+  el('loanList').innerHTML = list.map(function (l) {
+    var st = String(l.status || ''), cls = l.owed <= 0 ? 'done' : st.indexOf('Overdue') !== -1 ? 'over' : 'open';
+    var h = '<div class="loan"><div class="head"><div class="av">' + esc(initials(l.person)) + '</div>' +
+      '<div class="who">' + esc(l.person || 'Someone') + '<span class="badge ' + cls + '">' + esc(l.owed <= 0 ? 'Paid back' : st || 'Open') + '</span>' +
+      '<small>Lent ' + esc(l.date) + (l.due ? ' · due ' + esc(l.due) : '') + (l.from ? ' · from ' + esc(short(l.from)) : '') + '</small></div>' +
+      '<div class="owe">' + money(Math.max(0, l.owed)) + '<small>of ' + money(l.amount) + '</small></div></div>' +
+      '<div class="track"><div style="width:' + Math.min(100, Math.max(0, l.repaid / l.amount * 100)) + '%;background:#1d7a4f"></div></div>' +
+      '<div class="actions"><span>' + (l.repaid > 0 ? money(l.repaid) + ' paid back' + (l.into ? ' into ' + esc(short(l.into)) : '') : (l.notes ? esc(String(l.notes).slice(0, 60)) : 'Nothing paid back yet')) + '</span>' +
+      (l.owed > 0 ? '<button class="btn2" onclick="openRepay(' + l.row + ')">Mark repaid</button>' : '') + '</div>';
+    if (REPAY_OPEN === l.row && l.owed > 0) {
+      h += '<div class="repay"><div class="field"><label>Amount paid back</label><div class="money" style="width:100%"><span>$</span>' +
+        '<input id="rpAmt" inputmode="decimal" value="' + l.owed.toFixed(2) + '"></div></div>' +
+        '<div class="field"><label>Paid back into</label><select id="rpInto">' + bankOptions(l.into || D.bank) + '</select></div>' +
+        '<div class="field"><label>Date</label><input class="date" type="date" id="rpDate" value="' + D.today + '" style="width:100%;font-size:16px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px"></div>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn2" onclick="openRepay(0)">Cancel</button>' +
+        '<button class="btn2 solid" id="rpSave" onclick="saveRepay(' + l.row + ')">Save repayment</button></div></div>';
+    }
+    return h + '</div>';
+  }).join('');
+}
+function openRepay(row) { REPAY_OPEN = row; renderLoans(); if (row && el('rpAmt')) el('rpAmt').focus(); }
+function saveRepay(row) {
+  var amt = num(el('rpAmt').value);
+  if (!(amt > 0)) return toast('Enter the amount paid back', true);
+  el('rpSave').disabled = true; el('rpSave').textContent = 'Saving…';
+  var e = { id: Date.now() + '-' + Math.random().toString(36).slice(2, 8), kind: 'repay', row: row, amount: amt, into: el('rpInto').value, date: el('rpDate').value };
+  call('appSave', [PIN, e], function (res) {
+    REPAY_OPEN = 0; DASH_STALE = true; render(res.data); toast('✓ Repayment saved');
+  });
+}
+
+function coinDir(d) {
+  DIR = d; el('d-home').classList.toggle('on', d === 'home'); el('d-purse').classList.toggle('on', d === 'purse'); renderFlow();
+}
+function renderFlow() {
+  if (!D) return;
+  var v = num(el('coinsAmount').value);
+  var a = DIR === 'home' ? D.purse : D.coins, b = DIR === 'home' ? D.coins : D.purse;
+  var end = function (name, delta) {
+    return '<div class="end"><div class="e">' + (name === D.purse ? '👛' : '🫙') + '</div><small>' + esc(short(name)) + '</small><b>' +
+      money(bal(name)) + '</b>' + (v ? '<div class="after">after: ' + money(bal(name) + delta) + '</div>' : '') + '</div>';
+  };
+  el('flow').innerHTML = end(a, -v) + '<div class="arrow">→</div>' + end(b, v);
+  setSave();
+}
+
+function dateLabel(k) {
+  var v = el(k + 'Date').value;
+  el(k + 'DateLabel').textContent = !v || v === (D && D.today) ? '📅 Today' : '📅 Date';
+}
+
+function showTab(t) {
+  TAB = t;
+  TABS.forEach(function (k) {
+    el('p-' + k).classList.toggle('hide', k !== t); el('t-' + k).classList.toggle('on', k === t);
+  });
+  el('title').textContent = { shift: 'What happened today?', coras: 'Cora’s paid you', other: 'Log a spend', income: 'Log other income', transfer: 'Move money between accounts', coins: 'Move coins', loans: 'Loans' }[t];
+  setSave();
+}
+
+function ready() {
+  if (!D) return false;
+  if (TAB === 'shift') return D.shiftFields.some(function (f) { return num(el('f-' + f.key).value) > 0; });
+  if (TAB === 'coras') { var a = num(el('corasAmount').value), c = num(el('corasTips').value); return a > 0 && c <= a && !!el('corasAccount').value; }
+  if (TAB === 'loans') return !!el('loanPerson').value.trim() && num(el('loanAmount').value) > 0 && !!el('loanFrom').value;
+  if (TAB === 'income') return num(el('incomeAmount').value) > 0 && !!el('incomeCategory').value && !!el('incomeAccount').value;
+  if (TAB === 'transfer') return num(el('trAmount').value) > 0 && !!el('trFrom').value && !!el('trTo').value && el('trFrom').value !== el('trTo').value;
+  if (TAB === 'other') return num(el('otherAmount').value) > 0 && !!el('category').value && (catType() !== 'Transfer' || !!el('transferTo').value);
+  return num(el('coinsAmount').value) > 0;
+}
+function setSave() {
+  var b = el('saveBtn'); b.disabled = BUSY || !ready();
+  b.textContent = BUSY ? 'Saving…' : TAB === 'shift' ? 'Save shift' : TAB === 'coras' ? 'Save Interac' : TAB === 'income' ? 'Save income' : TAB === 'loans' ? 'Save loan' : TAB === 'transfer' ? 'Save transfer' : TAB === 'other' ? 'Save spend' : (DIR === 'home' ? 'Save: coins to home' : 'Save: coins to purse');
+}
+
+function save() {
+  if (BUSY || !ready()) return;
+  var e = { id: Date.now() + '-' + Math.random().toString(36).slice(2, 8), kind: TAB };
+  if (TAB === 'shift') {
+    e.date = el('shiftDate').value; e.details = el('shiftDetails').value; e.values = {};
+    D.shiftFields.forEach(function (f) { e.values[f.key] = el('f-' + f.key).value; });
+  } else if (TAB === 'coras') {
+    e.date = el('corasDate').value; e.amount = el('corasAmount').value; e.cardTips = el('corasTips').value || '0';
+    e.account = el('corasAccount').value; e.details = el('corasDetails').value;
+  } else if (TAB === 'loans') {
+    e.kind = 'loan'; e.date = el('loansDate').value; e.person = el('loanPerson').value; e.amount = el('loanAmount').value;
+    e.from = el('loanFrom').value; e.due = el('loanDue').value; e.details = el('loanNotes').value;
+  } else if (TAB === 'income') {
+    e.kind = 'other'; e.date = el('incomeDate').value; e.category = el('incomeCategory').value; e.amount = el('incomeAmount').value;
+    e.account = el('incomeAccount').value; e.transferTo = ''; e.details = el('incomeDetails').value;
+  } else if (TAB === 'transfer') {
+    e.date = el('transferDate').value; e.amount = el('trAmount').value; e.from = el('trFrom').value; e.to = el('trTo').value; e.details = el('trDetails').value;
+  } else if (TAB === 'other') {
+    e.date = el('otherDate').value; e.category = el('category').value; e.amount = el('otherAmount').value;
+    e.account = el('account').value; e.transferTo = el('transferTo').value; e.details = el('otherDetails').value;
+  } else {
+    e.date = el('coinsDate').value; e.amount = el('coinsAmount').value; e.direction = DIR; e.details = el('coinsDetails').value;
+  }
+  BUSY = true; setSave();
+  call('appSave', [PIN, e], function (res) {
+    BUSY = false; DASH_STALE = true; clearForm(); render(res.data);
+    toast(res.saved ? '✓ Saved ' + res.saved + (res.saved === 1 ? ' line' : ' lines') : '✓ Already saved');
+  });
+}
+
+function clearForm() {
+  if (TAB === 'shift') {
+    D.shiftFields.forEach(function (f) { var i = el('f-' + f.key); i.value = ''; i.parentNode.classList.remove('filled'); });
+    el('shiftDetails').value = '';
+  } else if (TAB === 'coras') {
+    el('corasAmount').value = ''; el('corasTips').value = ''; el('corasDetails').value = ''; CORAS_EDITED = false;
+  } else if (TAB === 'loans') {
+    el('loanPerson').value = ''; el('loanAmount').value = ''; el('loanDue').value = ''; el('loanNotes').value = '';
+  } else if (TAB === 'income') {
+    el('incomeAmount').value = ''; el('incomeDetails').value = ''; el('incomeCategory').value = '';
+  } else if (TAB === 'transfer') {
+    el('trAmount').value = ''; el('trDetails').value = '';
+  } else if (TAB === 'other') {
+    el('otherAmount').value = ''; el('otherDetails').value = ''; el('category').value = ''; el('transferTo').value = ''; categoryChanged();
+  } else {
+    el('coinsAmount').value = ''; el('coinsDetails').value = '';
+  }
+  el(TAB + 'Date').value = D.today;
+}
+
+function renderRecent() {
+  var list = D.recent || [];
+  if (!list.length) { el('recent').innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
+  el('recent').innerHTML = list.map(function (r) {
+    var t = String(r.type || '').toLowerCase();
+    var cls = t.indexOf('transfer') !== -1 ? 'tr' : (t.indexOf('income') !== -1 || t.indexOf('tip') !== -1 && t.indexOf('out') === -1) ? 'in' : 'out';
+    var icon = cls === 'tr' ? '🔁' : cls === 'in' ? '⬇️' : '⬆️';
+    var where = r.to ? short(r.account) + ' → ' + short(r.to) : short(r.account);
+    return '<div class="item"><div class="dot ' + cls + '">' + icon + '</div><div class="what">' + esc(r.category) +
+      '<small>' + esc(r.date) + ' · ' + esc(where) + (r.details ? ' · ' + esc(r.details) : '') + '</small></div>' +
+      '<div class="amt ' + (cls === 'in' ? 'pos' : cls === 'out' ? 'neg' : '') + '">' + (cls === 'in' ? '+' : cls === 'out' ? '−' : '') + money(r.amount) + '</div></div>';
+  }).join('');
+}
+
+// Show last time's numbers at once, then refresh them.
+(function () {
+  var c = cacheGet('mt_data');
+  if (c) {
+    var n = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; };
+    c.today = n.getFullYear() + '-' + p(n.getMonth() + 1) + '-' + p(n.getDate());
+    try { render(c, true); } catch (e) {}
+  }
+  load();
+})();
+</script>
+</body></html>
